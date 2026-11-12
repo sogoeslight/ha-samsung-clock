@@ -30,7 +30,9 @@ Plus the **Before the first morning alarm** blueprint: run actions N minutes bef
 2. Android 13+ blocks accessibility for apps installed from a file. Open **Settings → Apps → Clock Bridge → ⋮ → Allow restricted settings**.
 3. In the app, paste the webhook URL and tap **Save**.
 4. **Open Accessibility settings** → **Installed apps → Clock Bridge: alarm reader** → turn on.
-5. Tap **Open Clock**. The app status should show `Sent N alarms`.
+5. Tap **Open Clock**. The status card should turn green and show "Sent to Home Assistant just now".
+
+> After updating the app, Android may turn the accessibility service off. The app shows "Alarm reader is off" with a button to turn it back on.
 
 The service receives events **only** from Samsung Clock (`com.sec.android.app.clockpackage`) and reads nothing in other apps.
 

@@ -24,6 +24,8 @@ final class Sender {
     static final String KEY_SENT_SIG = "sent_sig";    // alarm list last delivered
     static final String KEY_STATUS = "status";
     static final String KEY_LAST = "last_payload";
+    static final String KEY_OK_AT = "ok_at";          // epoch millis of last successful delivery
+    static final String KEY_ERROR = "error";          // current problem, removed on success
     private static final String TAG = "ClockBridge";
     private static final int JOB_ID = 1;
     private static final ExecutorService IO = Executors.newSingleThreadExecutor();
@@ -68,7 +70,11 @@ final class Sender {
         String pending = sp.getString(KEY_PENDING, null);
         if (pending == null) return true;
         String url = sp.getString(KEY_URL, "").trim();
-        if (url.isEmpty()) { status(c, "Webhook URL is not set"); return true; }
+        if (url.isEmpty()) {
+            sp.edit().putString(KEY_ERROR, "Add your Home Assistant webhook URL below.").apply();
+            status(c, "Webhook URL is not set");
+            return true;
+        }
         HttpURLConnection conn = null;
         try {
             byte[] body = pending.getBytes(StandardCharsets.UTF_8);
@@ -83,16 +89,22 @@ final class Sender {
             if (code >= 200 && code < 300) {
                 JSONObject sent = new JSONObject(pending);
                 // Only clear if nothing newer was queued meanwhile.
-                SharedPreferences.Editor e = sp.edit().putString(KEY_SENT_SIG, signature(sent));
+                SharedPreferences.Editor e = sp.edit().putString(KEY_SENT_SIG, signature(sent))
+                        .putLong(KEY_OK_AT, System.currentTimeMillis()).remove(KEY_ERROR);
                 if (pending.equals(sp.getString(KEY_PENDING, null))) e.remove(KEY_PENDING);
                 e.apply();
                 status(c, "Sent " + sent.optJSONArray("alarms").length() + " alarms");
                 return !sp.contains(KEY_PENDING) || flush(c);
             }
-            status(c, "Home Assistant error: HTTP " + code);
+            String err = code == 404 || code == 405
+                    ? "Home Assistant doesn't know this webhook (HTTP " + code + "). Check the URL."
+                    : "Home Assistant error: HTTP " + code;
+            sp.edit().putString(KEY_ERROR, err).apply();
+            status(c, err);
             return code >= 400 && code < 500;  // bad URL / payload: retrying will not help
         } catch (Exception ex) {
             Log.i(TAG, "send failed, will retry: " + ex);
+            sp.edit().putString(KEY_ERROR, "Can't reach Home Assistant. Will retry when online.").apply();
             status(c, "Cannot reach Home Assistant, will retry (" + ex.getClass().getSimpleName() + ")");
             return false;
         } finally {

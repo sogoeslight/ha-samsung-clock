@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="dev.scw.clockbridge" android:versionCode="2" android:versionName="0.2.0">
+    package="dev.scw.clockbridge" android:versionCode="3" android:versionName="0.3.0">
     <uses-sdk android:minSdkVersion="33" android:targetSdkVersion="36" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <!-- Android 11+ package visibility: needed to launch Samsung Clock from the app. -->
+    <queries>
+        <package android:name="com.sec.android.app.clockpackage" />
+    </queries>
     <application android:label="@string/app_name"
-        android:theme="@android:style/Theme.DeviceDefault.DayNight"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher"
+        android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true" android:allowBackup="false">
         <activity android:name=".MainActivity" android:exported="true">
             <intent-filter>

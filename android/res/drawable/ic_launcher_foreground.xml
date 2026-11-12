@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Alarm clock with a small "send" arrow: Samsung Clock -> Home Assistant. 108dp canvas, 66dp safe zone. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp" android:viewportWidth="108" android:viewportHeight="108">
+    <!-- bells -->
+    <path android:pathData="M31,41 A13,13 0 0 1 43,29" android:strokeColor="#FFFFFF" android:strokeWidth="5" android:strokeLineCap="round" android:fillColor="#00000000"/>
+    <path android:pathData="M65,29 A13,13 0 0 1 77,41" android:strokeColor="#FFFFFF" android:strokeWidth="5" android:strokeLineCap="round" android:fillColor="#00000000"/>
+    <!-- face -->
+    <path android:pathData="M54,36 A21,21 0 1 1 53.99,36 Z" android:strokeColor="#FFFFFF" android:strokeWidth="5" android:fillColor="#00000000"/>
+    <!-- hands -->
+    <path android:pathData="M54,46 L54,57 L62,62" android:strokeColor="#FFFFFF" android:strokeWidth="4.5" android:strokeLineCap="round" android:strokeLineJoin="round" android:fillColor="#00000000"/>
+    <!-- feet -->
+    <path android:pathData="M41,75 L37,80 M67,75 L71,80" android:strokeColor="#FFFFFF" android:strokeWidth="4.5" android:strokeLineCap="round" android:fillColor="#00000000"/>
+</vector>
