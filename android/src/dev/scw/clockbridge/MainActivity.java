@@ -204,9 +204,10 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
         enableButton.setVisibility(on ? View.GONE : View.VISIBLE);
 
         long okAt = sp.getLong(Sender.KEY_OK_AT, 0);
+        long now = System.currentTimeMillis();
         String sent = okAt == 0 ? "Nothing sent to Home Assistant yet"
-                : "Sent to Home Assistant " + DateUtils.getRelativeTimeSpanString(
-                        okAt, System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS);
+                : "Sent to Home Assistant " + (now - okAt < DateUtils.MINUTE_IN_MILLIS ? "just now"
+                        : DateUtils.getRelativeTimeSpanString(okAt, now, DateUtils.MINUTE_IN_MILLIS));
         sendLine.setText(error != null ? error + "\n" + sent : sent);
 
         JSONObject last = null;
