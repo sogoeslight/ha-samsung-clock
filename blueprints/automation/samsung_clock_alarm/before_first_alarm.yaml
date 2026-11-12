@@ -1,0 +1,74 @@
+blueprint:
+  name: Before the first morning alarm
+  description: >-
+    Run actions a set number of minutes before the earliest morning alarm from
+    one or more phones (Samsung Clock Alarm integration). Runs at most once per day.
+  domain: automation
+  source_url: https://github.com/sogoeslight/ha-samsung-clock/blob/main/blueprints/automation/samsung_clock_alarm/before_first_alarm.yaml
+  input:
+    alarm_sensors:
+      name: Alarm sensors
+      description: The "Next alarm" sensors of the phones to consider.
+      selector:
+        entity:
+          multiple: true
+          filter:
+            - integration: samsung_clock_alarm
+              domain: sensor
+    lead_minutes:
+      name: Minutes before the alarm
+      default: 60
+      selector:
+        number:
+          min: 0
+          max: 240
+          step: 5
+          unit_of_measurement: min
+    window_start:
+      name: Morning starts at
+      description: Alarms earlier than this are ignored.
+      default: "04:00:00"
+      selector:
+        time: {}
+    window_end:
+      name: Morning ends at
+      description: Alarms later than this are ignored (e.g. a 13:55 meeting reminder).
+      default: "11:00:00"
+      selector:
+        time: {}
+    actions:
+      name: Actions
+      description: What to do, e.g. turn on heating.
+      selector:
+        action: {}
+
+mode: single
+
+trigger_variables:
+  sensors: !input alarm_sensors
+  lead: !input lead_minutes
+  window_start: !input window_start
+  window_end: !input window_end
+
+triggers:
+  - trigger: template
+    value_template: >-
+      {% set ns = namespace(first=none) %}
+      {% for s in sensors %}
+        {% for u in state_attr(s, 'upcoming') or [] %}
+          {% set t = as_datetime(u.time) %}
+          {% set hm = as_local(t).strftime('%H:%M:%S') %}
+          {% if window_start <= hm <= window_end and (ns.first is none or t < ns.first) %}
+            {% set ns.first = t %}
+          {% endif %}
+        {% endfor %}
+      {% endfor %}
+      {{ ns.first is not none and ns.first - timedelta(minutes=lead | int) <= now() < ns.first }}
+
+conditions:
+  - condition: template
+    value_template: >-
+      {{ this.attributes.last_triggered is none
+         or as_local(this.attributes.last_triggered).date() != now().date() }}
+
+actions: !input actions

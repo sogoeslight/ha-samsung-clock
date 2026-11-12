@@ -1,0 +1,16 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Add a phone",
+        "description": "One entry per phone running the Clock Bridge app.",
+        "data": { "name": "Name (e.g. My phone)" }
+      },
+      "url": {
+        "title": "Webhook URL",
+        "description": "Enter this URL in the Clock Bridge app on the phone:\n\n`{url}`\n\nIt works away from home only if Home Assistant has an external URL (e.g. Nabu Casa). Press Submit to finish."
+      }
+    }
+  },
+  "entity": { "sensor": { "next_alarm": { "name": "Next alarm" } } }
+}

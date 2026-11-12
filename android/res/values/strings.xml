@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Clock Bridge</string>
+    <string name="service_label">Clock Bridge: alarm reader</string>
+    <string name="service_description">Reads the Samsung Clock alarm list while it is on screen and sends it to Home Assistant. No other apps are read.</string>
+</resources>

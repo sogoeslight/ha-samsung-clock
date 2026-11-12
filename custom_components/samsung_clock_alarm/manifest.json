@@ -1,0 +1,13 @@
+{
+  "domain": "samsung_clock_alarm",
+  "name": "Samsung Clock Alarm",
+  "codeowners": ["@sogoeslight"],
+  "config_flow": true,
+  "dependencies": ["webhook"],
+  "documentation": "https://github.com/sogoeslight/ha-samsung-clock",
+  "integration_type": "device",
+  "iot_class": "cloud_push",
+  "issue_tracker": "https://github.com/sogoeslight/ha-samsung-clock/issues",
+  "requirements": [],
+  "version": "0.2.0"
+}
