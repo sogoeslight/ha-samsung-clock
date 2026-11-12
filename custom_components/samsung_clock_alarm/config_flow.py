@@ -11,7 +11,7 @@ from homeassistant.config_entries import ConfigFlow, ConfigFlowResult
 from homeassistant.const import CONF_NAME
 from homeassistant.helpers.network import NoURLAvailableError
 
-from .const import CONF_WEBHOOK_ID, DOMAIN
+from .const import CONF_WEBHOOK_ID, DOMAIN, PHONE_GUIDE_URL
 
 
 class SamsungClockConfigFlow(ConfigFlow, domain=DOMAIN):
@@ -45,5 +45,5 @@ class SamsungClockConfigFlow(ConfigFlow, domain=DOMAIN):
         return self.async_show_form(
             step_id="url",
             data_schema=vol.Schema({}),
-            description_placeholders={"url": url},
+            description_placeholders={"url": url, "guide_url": PHONE_GUIDE_URL},
         )
