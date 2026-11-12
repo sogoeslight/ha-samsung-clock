@@ -69,7 +69,7 @@ async def test_webhook_sets_next_alarm_and_rolls_over(
     assert dt_util.parse_datetime(state.state) == datetime.fromisoformat("2026-11-13T04:31:00+02:00")
     assert state.attributes["clock_next"] == "Fri 13 Nov, 04:31"
     assert state.attributes["unparsed"] == []
-    assert [u["name"] for u in state.attributes["upcoming"][:3]] == ["", "Work", "Работа"]
+    assert [u["name"] for u in state.attributes["upcoming"][:3]] == ["", "Work", "Work 2"]
 
     # After the one-off 04:31 rings, the sensor moves on without any new data.
     freezer.move_to("2026-11-13T02:31:30+00:00")

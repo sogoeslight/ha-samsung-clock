@@ -23,11 +23,11 @@ PHONE_ALARMS = [
     {"name": "", "time": "04:31", "enabled": True, "schedule": "Friday, 13 November"},
     {"name": "Work", "time": "09:30", "enabled": True,
      "schedule": "Every Monday, Every Tuesday, Every Wednesday, Every Thursday, Every Friday"},
-    {"name": "Работа", "time": "09:35", "enabled": True,
+    {"name": "Work 2", "time": "09:35", "enabled": True,
      "schedule": "Every Monday, Every Tuesday, Every Wednesday, Every Thursday, Every Friday"},
     {"name": "Meeting", "time": "13:55", "enabled": True, "schedule": "Every Wednesday"},
-    {"name": "Позвонить ", "time": "20:00", "enabled": False, "schedule": "Every day"},
-    {"name": "Полночь-тест", "time": "23:59", "enabled": False, "schedule": "Every day"},
+    {"name": "Call ", "time": "20:00", "enabled": False, "schedule": "Every day"},
+    {"name": "Midnight", "time": "23:59", "enabled": False, "schedule": "Every day"},
 ]
 
 
@@ -48,7 +48,7 @@ def test_parse_dates():
 
 
 def test_parse_unknown_returns_none():
-    assert sch.parse_schedule("Каждый понедельник", TODAY) is None
+    assert sch.parse_schedule("Chaque lundi", TODAY) is None
     assert sch.parse_schedule("", TODAY) is None
 
 
@@ -56,12 +56,12 @@ def test_next_occurrences_from_phone_list():
     occ = sch.upcoming(PHONE_ALARMS, NOW, TODAY, days=7)
     first = occ[0]
     assert first.when == datetime(2026, 11, 13, 4, 31, tzinfo=RIGA)
-    # Friday: 04:31 one-off, then Work 09:30 and Работа 09:35
+    # Friday: 04:31 one-off, then Work 09:30 and Work 2 09:35
     assert [(o.when.strftime("%a %H:%M"), o.name) for o in occ[:3]] == [
-        ("Fri 04:31", ""), ("Fri 09:30", "Work"), ("Fri 09:35", "Работа"),
+        ("Fri 04:31", ""), ("Fri 09:30", "Work"), ("Fri 09:35", "Work 2"),
     ]
     # Disabled alarms never appear.
-    assert all(o.name not in ("Полночь-тест", "Позвонить ") for o in occ)
+    assert all(o.name not in ("Midnight", "Call ") for o in occ)
     # Meeting appears on Wednesday only.
     assert [o.when.date() for o in occ if o.name == "Meeting"] == [date(2026, 11, 18)]
 

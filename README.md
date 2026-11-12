@@ -1,75 +1,73 @@
 # Samsung Clock Alarm for Home Assistant
 
-Будильники **Samsung Clock** в Home Assistant, без помех от «Режимов и процедур» (Modes & Routines).
+**Samsung Clock** alarms in Home Assistant, unaffected by Samsung **Modes & Routines**.
 
-Сенсор `next_alarm` из приложения Companion показывает одно ближайшее системное событие от любого приложения. Процедуры Samsung тоже ставят такие события, поэтому вместо будильника приходит время процедуры. Этот проект берёт данные из самого Samsung Clock и показывает **все** будильники.
+The Companion app's `next_alarm` sensor reports a single "next alarm clock" event from *any* app. Samsung Modes & Routines schedule such events too, so the sensor often shows a routine instead of your alarm. This project reads the alarm list from Samsung Clock itself and gives Home Assistant **all** your alarms.
 
-Состоит из двух частей:
+It has two parts:
 
-| Часть | Что делает |
+| Part | What it does |
 |---|---|
-| **Clock Bridge** (Android, папка `android/`) | Когда вы открываете Часы, читает список будильников с экрана через службу специальных возможностей и отправляет его в HA. Без постоянного уведомления, без опроса, без root и без ADB. |
-| **Интеграция** (`custom_components/samsung_clock_alarm`) | Даёт каждому телефону свой webhook, хранит список и считает следующий будильник по дням недели, даже если Часы с тех пор не открывали. |
+| **Clock Bridge** (Android, `android/`) | When you open Clock, reads the alarm list from the screen through an accessibility service and sends it to Home Assistant. No persistent notification, no polling, no root, no ADB. |
+| **Integration** (`custom_components/samsung_clock_alarm`) | Gives each phone its own webhook, stores the alarm list and computes the next alarm from the weekday schedule, even if Clock hasn't been opened since. |
 
-Плюс blueprint **Before the first morning alarm**: запускает действия за N минут до самого раннего утреннего будильника с нескольких телефонов. Например, включает отопление.
+Plus the **Before the first morning alarm** blueprint: run actions N minutes before the earliest morning alarm across several phones, e.g. turn on the heating.
 
-## Установка
+## Installation
 
-### 1. Интеграция (HACS)
+### 1. Integration (HACS)
 
-1. HACS → ⋮ → **Custom repositories** → адрес этого репозитория, тип **Integration**.
-2. Установить **Samsung Clock Alarm**, перезапустить HA.
-3. **Настройки → Устройства и службы → Добавить интеграцию → Samsung Clock Alarm**. Ввести имя телефона и скопировать показанный адрес webhook.
-   Повторить для каждого телефона.
+1. HACS → ⋮ → **Custom repositories** → this repository's URL, type **Integration**.
+2. Install **Samsung Clock Alarm** and restart Home Assistant.
+3. **Settings → Devices & services → Add integration → Samsung Clock Alarm**. Enter a name for the phone and copy the webhook URL shown.
+   Repeat for every phone.
 
-> Чтобы телефоны могли отправлять данные вне дома, у HA должен быть внешний адрес (Nabu Casa или свой домен). Без него обновление уйдёт, когда телефон вернётся в домашнюю сеть: приложение повторяет отправку само.
+> For phones to report while away from home, Home Assistant needs an external URL (Nabu Casa or your own domain). Without one, updates are delivered once the phone is back on the home network: the app retries on its own.
 
-### 2. Clock Bridge (на каждый телефон)
+### 2. Clock Bridge (on every phone)
 
-1. Установить `ClockBridge.apk` из раздела Releases.
-2. Android 13+ блокирует специальные возможности для приложений, установленных из файла. Откройте **Настройки → Приложения → Clock Bridge → ⋮ → Разрешить ограниченные настройки**.
-3. В приложении вставить адрес webhook и нажать **Save**.
-4. **Open Accessibility settings** → **Установленные приложения → Clock Bridge: alarm reader** → включить.
-5. Нажать **Open Clock**. В статусе приложения должно появиться `Sent N alarms`.
+1. Install `ClockBridge-x.y.z.apk` from [Releases](https://github.com/sogoeslight/ha-samsung-clock/releases).
+2. Android 13+ blocks accessibility for apps installed from a file. Open **Settings → Apps → Clock Bridge → ⋮ → Allow restricted settings**.
+3. In the app, paste the webhook URL and tap **Save**.
+4. **Open Accessibility settings** → **Installed apps → Clock Bridge: alarm reader** → turn on.
+5. Tap **Open Clock**. The app status should show `Sent N alarms`.
 
-Служба получает события **только** от Samsung Clock (`com.sec.android.app.clockpackage`) и ничего не читает в других приложениях.
+The service receives events **only** from Samsung Clock (`com.sec.android.app.clockpackage`) and reads nothing in other apps.
 
-### 3. Автоматизация
+### 3. Automation
 
-Импортируйте blueprint:
+Import the blueprint:
 
 ```
 https://github.com/sogoeslight/ha-samsung-clock/blob/main/blueprints/automation/samsung_clock_alarm/before_first_alarm.yaml
 ```
 
-Выберите сенсоры обоих телефонов и задайте, за сколько минут срабатывать. Окно «утра» (по умолчанию 04:00–11:00) отсекает дневные будильники-напоминания. Автоматизация срабатывает не чаще раза в день.
+Pick the sensors of all phones and how many minutes in advance to run. The "morning" window (04:00–11:00 by default) filters out daytime reminder alarms. The automation runs at most once a day.
 
-## Сенсор
+## Sensor
 
-`sensor.<телефон>_next_alarm` (`timestamp`): ближайший включённый будильник, или `unknown`, если включённых будильников нет.
+`sensor.<phone>_next_alarm` (`timestamp`): the next enabled alarm, or `unknown` when no alarm is enabled.
 
-| Атрибут | |
+| Attribute | |
 |---|---|
-| `alarm_name` | название ближайшего будильника |
-| `upcoming` | все срабатывания на 7 дней вперёд `[{time, name}]` |
-| `alarms` | список как в Часах: `name`, `time`, `enabled`, `schedule` |
-| `clock_next` | что Часы сами пишут в заголовке, например «Fri 13 Nov, 04:31» |
-| `read_at` / `received_at` | когда список прочитан на телефоне / получен HA |
-| `unparsed` | будильники, расписание которых не удалось разобрать |
+| `alarm_name` | label of the next alarm |
+| `upcoming` | all occurrences in the next 7 days `[{time, name}]` |
+| `alarms` | the list as shown in Clock: `name`, `time`, `enabled`, `schedule` |
+| `clock_next` | what Clock itself shows in its header, e.g. "Fri 13 Nov, 04:31" |
+| `read_at` / `received_at` | when the list was read on the phone / received by Home Assistant |
+| `unparsed` | alarms whose schedule could not be understood |
 
-Интерфейс приложения и интеграции на английском.
+## Limitations
 
-## Ограничения
+- **Updates when Clock is opened.** If an alarm is changed another way (voice, Galaxy Watch, a widget), Home Assistant learns about it the next time Clock is opened. Alarms that have rung are rolled over by Home Assistant on its own.
+- **English phone UI.** Schedules ("Every Monday", "Friday, 13 November") are parsed in English. Anything unrecognised shows up in `unparsed`.
+- **24-hour time format.**
+- **Long lists.** If the alarms don't fit on one screen, the app sends only the visible ones and Home Assistant merges them with what it already knows. An alarm deleted at the bottom of a long list may linger until you scroll down to it.
+- Tested on Galaxy S23, One UI with Android 16, Samsung Clock 12.6. A Samsung Clock update may change its screen layout.
 
-- **Обновление при открытии Часов.** Если будильник изменили по-другому (голосом, с часов Galaxy Watch, виджетом), HA узнает об этом при следующем открытии Часов. Прозвеневший будильник HA пересчитывает сам.
-- **Английский интерфейс телефона.** Расписание («Every Monday», «Friday, 13 November») разбирается на английском. Нераспознанные строки попадут в `unparsed`.
-- **24-часовой формат времени.**
-- **Длинный список.** Если будильники не помещаются на экран, приложение отправляет только видимые, а HA объединяет их с известными. Удалённый будильник внизу длинного списка может остаться в HA, пока не прокрутите до конца.
-- Проверено на Galaxy S23, One UI c Android 16, Samsung Clock 12.6. Обновление Samsung Clock может поменять разметку экрана.
-
-## Разработка
+## Development
 
 ```
-pytest                   # тесты: разбор расписания, интеграция в HA, шаблон blueprint
-android/build.sh         # сборка APK (JDK 17 + Android SDK build-tools 37, platform 36)
+pytest                   # tests: schedule parsing, the integration inside Home Assistant, blueprint template
+android/build.sh         # build the APK (JDK 17 + Android SDK build-tools 37, platform 36)
 ```
