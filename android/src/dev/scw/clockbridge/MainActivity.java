@@ -36,7 +36,8 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
     private int cPage, cCard, cText, cMuted, cAccent, cOnAccent, cGood, cWarn, cTonal;
 
     private TextView dot, serviceLine, sendLine, nextLine;
-    private Button enableButton;
+    private Button enableButton, restrictedButton;
+    private TextView restrictedHelp;
     private LinearLayout alarmsBox;
     private EditText url;
 
@@ -80,6 +81,15 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
         enableButton = button("Turn on in Accessibility", true,
                 () -> startActivity(new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)));
         status.addView(enableButton, buttonParams(px(14)));
+        // Sideloaded apps: Android 13+ greys the switch out as a "restricted setting" until
+        // the user allows it from App info → ⋮ → Allow restricted settings.
+        restrictedHelp = text("Switch greyed out or \"Restricted setting\"? Open App info, tap ⋮ in the "
+                + "top-right corner → Allow restricted settings, then try again.", 13, cMuted, false);
+        restrictedHelp.setPadding(px(4), px(12), px(4), 0);
+        status.addView(restrictedHelp);
+        restrictedButton = button("Open App info", false, () -> startActivity(
+                new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + getPackageName()))));
+        status.addView(restrictedButton, buttonParams(px(10)));
 
         // Actions
         LinearLayout actions = new LinearLayout(this);
@@ -202,6 +212,8 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
             serviceLine.setText("Working");
         }
         enableButton.setVisibility(on ? View.GONE : View.VISIBLE);
+        restrictedHelp.setVisibility(on ? View.GONE : View.VISIBLE);
+        restrictedButton.setVisibility(on ? View.GONE : View.VISIBLE);
 
         long okAt = sp.getLong(Sender.KEY_OK_AT, 0);
         long now = System.currentTimeMillis();

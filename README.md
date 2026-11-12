@@ -26,20 +26,17 @@ Plus the **Before the first morning alarm** blueprint: run actions N minutes bef
 
 ### 2. Clock Bridge (on every phone)
 
-Requirements: phone language **English**, **24-hour** time (Settings → General management → Date and time).
+**[⬇ Download Clock Bridge](https://github.com/sogoeslight/ha-samsung-clock/releases/latest/download/ClockBridge.apk)** — the link always points to the newest version.
 
-1. On the phone, open [Releases](https://github.com/sogoeslight/ha-samsung-clock/releases) and download `ClockBridge-x.y.z.apk`. Open it and allow your browser / My Files to install unknown apps when asked.
-   If Samsung **Auto Blocker** is on (Settings → Security and privacy → Auto Blocker), it blocks the install: turn it off for the install and back on afterwards.
-2. Open **Clock Bridge**, paste the webhook URL from Home Assistant and tap **Save**.
-3. Tap **Turn on in Accessibility** → **Installed apps → Clock Bridge: alarm reader**. Android 13+ says it's a *restricted setting* the first time — that's expected for apps installed from a file. Then:
-   **Settings → Apps → Clock Bridge → ⋮ (top right) → Allow restricted settings**, confirm, and go back to Accessibility to turn the service on.
-4. Back in Clock Bridge, tap **Open Clock**. The status card should turn green and show "Sent to Home Assistant just now".
+<img src="docs/download-qr.png" width="160" alt="QR code: download Clock Bridge">
 
-Installing over USB with `adb install ClockBridge-x.y.z.apk` skips step 1's prompts and the restricted-setting step.
+**Step-by-step guide for the phone owner: [docs/install-phone.md](docs/install-phone.md)** — no computer needed, about 5 minutes. Send them this link along with their webhook URL.
+
+In short: phone language English and 24-hour time; install the APK (allow unknown apps; turn Samsung Auto Blocker off for the install); paste the webhook URL; turn on **Clock Bridge: alarm reader** in Accessibility (the first time Android calls it a *restricted setting*: App info → ⋮ → **Allow restricted settings**); tap **Open Clock** and check the dot is green.
+
+Installing over USB with `adb install ClockBridge.apk` skips the unknown-apps and restricted-setting prompts.
 
 > After updating the app, Android may turn the accessibility service off. The app shows "Alarm reader is off" with a button to turn it back on.
-
-The service receives events **only** from Samsung Clock (`com.sec.android.app.clockpackage`) and reads nothing in other apps.
 
 ### 3. Automation
 
