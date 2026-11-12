@@ -26,11 +26,16 @@ Plus the **Before the first morning alarm** blueprint: run actions N minutes bef
 
 ### 2. Clock Bridge (on every phone)
 
-1. Install `ClockBridge-x.y.z.apk` from [Releases](https://github.com/sogoeslight/ha-samsung-clock/releases).
-2. Android 13+ blocks accessibility for apps installed from a file. Open **Settings → Apps → Clock Bridge → ⋮ → Allow restricted settings**.
-3. In the app, paste the webhook URL and tap **Save**.
-4. **Open Accessibility settings** → **Installed apps → Clock Bridge: alarm reader** → turn on.
-5. Tap **Open Clock**. The status card should turn green and show "Sent to Home Assistant just now".
+Requirements: phone language **English**, **24-hour** time (Settings → General management → Date and time).
+
+1. On the phone, open [Releases](https://github.com/sogoeslight/ha-samsung-clock/releases) and download `ClockBridge-x.y.z.apk`. Open it and allow your browser / My Files to install unknown apps when asked.
+   If Samsung **Auto Blocker** is on (Settings → Security and privacy → Auto Blocker), it blocks the install: turn it off for the install and back on afterwards.
+2. Open **Clock Bridge**, paste the webhook URL from Home Assistant and tap **Save**.
+3. Tap **Turn on in Accessibility** → **Installed apps → Clock Bridge: alarm reader**. Android 13+ says it's a *restricted setting* the first time — that's expected for apps installed from a file. Then:
+   **Settings → Apps → Clock Bridge → ⋮ (top right) → Allow restricted settings**, confirm, and go back to Accessibility to turn the service on.
+4. Back in Clock Bridge, tap **Open Clock**. The status card should turn green and show "Sent to Home Assistant just now".
+
+Installing over USB with `adb install ClockBridge-x.y.z.apk` skips step 1's prompts and the restricted-setting step.
 
 > After updating the app, Android may turn the accessibility service off. The app shows "Alarm reader is off" with a button to turn it back on.
 
