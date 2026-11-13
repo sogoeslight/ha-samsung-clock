@@ -75,3 +75,5 @@ Pick the sensors of all phones and how many minutes in advance to run. The "morn
 pytest                   # tests: schedule parsing, the integration inside Home Assistant, blueprint template
 android/build.sh         # build the APK (JDK 17 + Android SDK build-tools 37, platform 36)
 ```
+
+Releases are built by GitHub Actions (`.github/workflows/apk.yml`): bump `versionName`/`versionCode` in `android/AndroidManifest.xml` and `version` in `manifest.json`, then push a tag `vX.Y.Z`. The workflow builds `ClockBridge.apk`, signs it and attaches it to the release. It needs the repository secret `KEYSTORE_BASE64` (`base64 -w0 android/release.keystore`) and, if the keystore password is not `android`, `KEYSTORE_PASS`. Every push and pull request also builds a test APK, signed with a throwaway key, as a workflow artifact.
